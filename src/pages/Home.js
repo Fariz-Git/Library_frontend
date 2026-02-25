@@ -1,51 +1,51 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../services/api";
+import { Box, Button } from "@mui/material";
+
+const BASE_URL = "http://localhost:3001";
 
 function Home() {
   const navigate = useNavigate();
 
-  const [studentsCount, setStudentsCount] = useState(0);
-  const [booksCount, setBooksCount] = useState(0);
-  const [borrowCount, setBorrowCount] = useState(0);
+  const [students, setStudents] = useState(0);
+  const [books, setBooks] = useState(0);
+  const [borrow, setBorrow] = useState(0);
 
   useEffect(() => {
-    api.getStudents().then((data) =>
-      setStudentsCount(data.length)
-    );
+    fetch(`${BASE_URL}/students?page=1&limit=1`)
+      .then(res => res.json())
+      .then(data => setStudents(data.total));
 
-    api.getBooks().then((data) =>
-      setBooksCount(data.length)
-    );
+    fetch(`${BASE_URL}/books?page=1&limit=1`)
+      .then(res => res.json())
+      .then(data => setBooks(data.total));
 
-    api.getBorrows().then((data) =>
-      setBorrowCount(data.length)
-    );
+    fetch(`${BASE_URL}/borrow?page=1&limit=1`)
+      .then(res => res.json())
+      .then(data => setBorrow(data.total));
   }, []);
 
   return (
-    <div style={{ textAlign: "center", padding: "40px" }}>
+    <Box textAlign="center" p={4}>
       <h1>Library Management</h1>
 
-      <div style={{ margin: "20px" }}>
-        <button onClick={() => navigate("/students")}>
-          Students
-        </button>
-        <button onClick={() => navigate("/books")} style={{ marginLeft: "10px" }}>
-          Books
-        </button>
-        <button onClick={() => navigate("/borrow")} style={{ marginLeft: "10px" }}>
-          Borrow
-        </button>
-      </div>
+      <Button variant="contained" onClick={() => navigate("/students")} sx={{ m: 1 }}>
+        Students
+      </Button>
+      <Button variant="contained" onClick={() => navigate("/books")} sx={{ m: 1 }}>
+        Books
+      </Button>
+      <Button variant="contained" onClick={() => navigate("/borrow")} sx={{ m: 1 }}>
+        Borrow
+      </Button>
 
       <hr />
 
       <h3>Dashboard Details</h3>
-      <p>Total Students: {studentsCount}</p>
-      <p>Total Books: {booksCount}</p>
-      <p>Total Borrow Records: {borrowCount}</p>
-    </div>
+      <p>Total Students: {students}</p>
+      <p>Total Books: {books}</p>
+      <p>Total Borrow Records: {borrow}</p>
+    </Box>
   );
 }
 
