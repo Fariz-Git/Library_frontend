@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState  } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Button,
@@ -25,8 +25,15 @@ function Students() {
   const [pageSize] = useState(10);
   const [rowCount, setRowCount] = useState(0);
 
-  const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
+
   const [editData, setEditData] = useState(null);
+  const [newStudent, setNewStudent] = useState({
+    name: "",
+    email: "",
+    department: "",
+  });
 
   const fetchStudents = useCallback(async () => {
     const res = await fetch(
@@ -52,13 +59,20 @@ function Students() {
     await fetch(`${BASE_URL}/students/${editData.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: editData.name,
-        email: editData.email,
-        department: editData.department,
-      }),
+      body: JSON.stringify(editData),
     });
-    setOpen(false);
+    setOpenEdit(false);
+    fetchStudents();
+  };
+
+  const handleAdd = async () => {
+    await fetch(`${BASE_URL}/students`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newStudent),
+    });
+    setOpenAdd(false);
+    setNewStudent({ name: "", email: "", department: "" });
     fetchStudents();
   };
 
@@ -76,7 +90,7 @@ function Students() {
             sx={{ cursor: "pointer", mr: 1 }}
             onClick={() => {
               setEditData(params.row);
-              setOpen(true);
+              setOpenEdit(true);
             }}
           />
           <DeleteIcon
@@ -91,25 +105,28 @@ function Students() {
   return (
     <Box p={3}>
       
-      <h2 style={{ textAlign: "center" }}>STUDENTS</h2>
+    <Box textAlign="center">
+     <h2>Students</h2>
+      </Box>
 
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        hideFooter
-        autoHeight
-      />
+    <Box display="flex" justifyContent="flex-end" mb={2}>
+      <Button size="small" variant="contained" onClick={() => setOpenAdd(true)}>
+    + Add Student
+    </Button>
+    </Box>
+
+      <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
 
       <Stack mt={2} alignItems="center">
         <Pagination
           count={Math.ceil(rowCount / pageSize)}
           page={page + 1}
           onChange={(e, value) => setPage(value - 1)}
-          color="primary"
         />
       </Stack>
 
-      <Dialog open={open} onClose={() => setOpen(false)}>
+      {/* Edit Dialog */}
+      <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
         <DialogTitle>Edit Student</DialogTitle>
         <DialogContent>
           <TextField
@@ -141,14 +158,58 @@ function Students() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
           <Button variant="contained" onClick={handleUpdate}>
             Update
           </Button>
         </DialogActions>
       </Dialog>
 
-       <center><Button variant="outlined" onClick={() => navigate("/")}>
+      {/* Add Dialog */}
+      <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
+        <DialogTitle>Add Student</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Name"
+            value={newStudent.name}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, name: e.target.value })
+            }
+          />
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Email"
+            value={newStudent.email}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, email: e.target.value })
+            }
+          />
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Department"
+            value={newStudent.department}
+            onChange={(e) =>
+              setNewStudent({
+                ...newStudent,
+                department: e.target.value,
+              })
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAdd(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleAdd}>
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <center>
+      <Button variant="outlined" onClick={() => navigate("/")}>
         ← Back to Home
       </Button>
       </center>

@@ -1,4 +1,4 @@
-import { useEffect, useState ,useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Button,
@@ -25,8 +25,16 @@ function Books() {
   const [pageSize] = useState(10);
   const [rowCount, setRowCount] = useState(0);
 
-  const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
+
   const [editData, setEditData] = useState(null);
+  const [newBook, setNewBook] = useState({
+    title: "",
+    author: "",
+    totalQuantity: "",
+    availableQuantity: "",
+  });
 
   const fetchBooks = useCallback(async () => {
     const res = await fetch(
@@ -57,7 +65,29 @@ function Books() {
         availableQuantity: Number(editData.availableQuantity),
       }),
     });
-    setOpen(false);
+    setOpenEdit(false);
+    fetchBooks();
+  };
+
+  const handleAdd = async () => {
+    await fetch(`${BASE_URL}/books`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: newBook.title,
+        author: newBook.author,
+        totalQuantity: Number(newBook.totalQuantity),
+      }),
+    });
+
+    setOpenAdd(false);
+    setNewBook({
+      title: "",
+      author: "",
+      totalQuantity: "",
+      availableQuantity: "",
+    });
+
     fetchBooks();
   };
 
@@ -76,7 +106,7 @@ function Books() {
             sx={{ cursor: "pointer", mr: 1 }}
             onClick={() => {
               setEditData(params.row);
-              setOpen(true);
+              setOpenEdit(true);
             }}
           />
           <DeleteIcon
@@ -90,8 +120,16 @@ function Books() {
 
   return (
     <Box p={3}>
-    
-      <h2 style={{ textAlign: "center" }}>BOOKS</h2>
+      {/* Centered Title */}
+      <Box textAlign="center">
+       <h2>Books</h2>
+        </Box>
+
+    <Box display="flex" justifyContent="flex-end" mb={2}>
+   <Button size="small" variant="contained" onClick={() => setOpenAdd(true)}>
+    + Add Book
+     </Button>
+      </Box>
 
       <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
 
@@ -100,11 +138,11 @@ function Books() {
           count={Math.ceil(rowCount / pageSize)}
           page={page + 1}
           onChange={(e, value) => setPage(value - 1)}
-          color="primary"
         />
       </Stack>
 
-      <Dialog open={open} onClose={() => setOpen(false)}>
+      {/* Edit Dialog */}
+      <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
         <DialogTitle>Edit Book</DialogTitle>
         <DialogContent>
           <TextField
@@ -122,19 +160,65 @@ function Books() {
             label="Available Quantity"
             value={editData?.availableQuantity || ""}
             onChange={(e) =>
-              setEditData({ ...editData, availableQuantity: e.target.value })
+              setEditData({
+                ...editData,
+                availableQuantity: e.target.value,
+              })
             }
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
           <Button variant="contained" onClick={handleUpdate}>
             Update
           </Button>
         </DialogActions>
       </Dialog>
-       
-       <center><Button variant="outlined" onClick={() => navigate("/")}>
+
+      {/* Add Dialog */}
+      <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
+        <DialogTitle>Add Book </DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Title"
+            value={newBook.title}
+            onChange={(e) =>
+              setNewBook({ ...newBook, title: e.target.value })
+            }
+          />
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Author"
+            value={newBook.author}
+            onChange={(e) =>
+              setNewBook({ ...newBook, author: e.target.value })
+            }
+          />
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Total Quantity"
+            value={newBook.totalQuantity}
+            onChange={(e) =>
+              setNewBook({
+                ...newBook,
+                totalQuantity: e.target.value,
+              })
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAdd(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleAdd}>
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <center>
+      <Button variant="outlined" onClick={() => navigate("/")}>
         ← Back to Home
       </Button>
       </center>
