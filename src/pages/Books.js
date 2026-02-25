@@ -13,7 +13,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { UNSAFE_ViewTransitionContext, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const BASE_URL = "http://localhost:3001";
 
