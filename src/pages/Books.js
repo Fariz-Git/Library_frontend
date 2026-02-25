@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState ,useCallback } from "react";
 import {
   Box,
   Button,
@@ -28,18 +28,18 @@ function Books() {
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState(null);
 
-  const fetchBooks = async () => {
+  const fetchBooks = useCallback(async () => {
     const res = await fetch(
       `${BASE_URL}/books?page=${page + 1}&limit=${pageSize}`
     );
     const data = await res.json();
     setRows(data.data);
     setRowCount(data.total);
-  };
+  }, [page, pageSize]);
 
   useEffect(() => {
     fetchBooks();
-  }, [page]);
+  }, [fetchBooks]);
 
   const handleDelete = async (id) => {
     await fetch(`${BASE_URL}/books/${id}`, {

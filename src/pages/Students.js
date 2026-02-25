@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState ,userCallback } from "react";
 import {
   Box,
   Button,
@@ -28,18 +28,18 @@ function Students() {
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState(null);
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     const res = await fetch(
       `${BASE_URL}/students?page=${page + 1}&limit=${pageSize}`
     );
     const data = await res.json();
     setRows(data.data);
     setRowCount(data.total);
-  };
+  }, [page, pageSize]);
 
   useEffect(() => {
     fetchStudents();
-  }, [page]);
+  }, [fetchStudents]);
 
   const handleDelete = async (id) => {
     await fetch(`${BASE_URL}/students/${id}`, {
