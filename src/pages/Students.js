@@ -106,7 +106,7 @@ function Students() {
     <Box p={3}>
       
     <Box textAlign="center">
-     <h2>Students</h2>
+     <h2>STUDENTS</h2>
       </Box>
 
     <Box display="flex" justifyContent="flex-end" mb={2}>

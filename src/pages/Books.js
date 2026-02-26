@@ -122,7 +122,7 @@ function Books() {
     <Box p={3}>
       {/* Centered Title */}
       <Box textAlign="center">
-       <h2>Books</h2>
+       <h2>BOOKS</h2>
         </Box>
 
     <Box display="flex" justifyContent="flex-end" mb={2}>

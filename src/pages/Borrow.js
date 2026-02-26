@@ -103,7 +103,7 @@ function Borrow() {
     <Box p={3}>
       {/* Centered Title */}
       <Box textAlign="center">
-        <h2>Borrow Books</h2>
+        <h2>BORROW BOOKS</h2>
       </Box>
 
       {/* Issue Button */}
