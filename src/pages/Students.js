@@ -1,15 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Stack,
-  Pagination,
-} from "@mui/material";
+import {Box, Button, Dialog,DialogTitle,DialogContent, DialogActions,
+  TextField, Stack, Pagination,MenuItem,Select,FormControl,
+  InputLabel } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -22,14 +14,14 @@ function Students() {
 
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize , setPageSize] = useState(10);
   const [rowCount, setRowCount] = useState(0);
 
   const [openEdit, setOpenEdit] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
 
   const [editData, setEditData] = useState(null);
-  const [search ,   setSearch] = useState (" ");
+  const [search ,   setSearch] = useState ("");
   const [newStudent, setNewStudent] = useState({
     name: "",
     email: "",
@@ -105,37 +97,69 @@ function Students() {
 
   return (
     <Box p={3}>
-      
+
     <Box textAlign="center">
      <h2>STUDENTS</h2>
       </Box>
 
-    <Box display="flex" justifyContent="flex-end" mb={2}>
-      <Button size="small" variant="contained" onClick={() => setOpenAdd(true)} >
-    + Add Student
-    </Button>
-    </Box>
-
-  <Box mb={2}>
-   <TextField
+ <Box 
+  display="flex" 
+  justifyContent="space-between" 
+  alignItems="center"
+  mb={2}
+>
+  {/* Search bar */}
+  <TextField
     size="small"
-     label="Search"
-      value={search}
-      onChange={(e) => {
+    label="Search"
+    value={search}
+    onChange={(e) => {
       setPage(0);
       setSearch(e.target.value);
-        }}
-      />
-    </Box>
+    }}
+    sx={{ width: 200 }}
+  />
+
+  {/* Add Student Button */}
+  <Button 
+    size="small" 
+    variant="contained" 
+    onClick={() => setOpenAdd(true)}
+  >
+    + Add Student
+      </Button>
+  </Box>
   
       <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
 
-      <Stack mt={2} alignItems="center">
+       <Stack
+        mt={2}
+        direction="row"
+        spacing={3}
+        justifyContent="center"
+        alignItems="center"
+      >
         <Pagination
           count={Math.ceil(rowCount / pageSize)}
           page={page + 1}
           onChange={(e, value) => setPage(value - 1)}
         />
+
+        <FormControl size="small">
+          <InputLabel>Per Page</InputLabel>
+          <Select
+            value={pageSize}
+            label="Per Page"
+            onChange={(e) => {
+              setPage(0);
+              setPageSize(e.target.value);
+            }}
+          >
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={25}>25</MenuItem>
+            <MenuItem value={50}>50</MenuItem>
+          </Select>
+        </FormControl>
       </Stack>
 
       {/* Edit Dialog */}

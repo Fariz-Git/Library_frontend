@@ -1,15 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Stack,
-  Pagination,
-} from "@mui/material";
+import {Box, Button, Dialog, DialogTitle, DialogContent, DialogActions,
+  TextField,Stack,Pagination,} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 
@@ -24,7 +15,7 @@ function Borrow() {
   const [rowCount, setRowCount] = useState(0);
 
   const [openIssue, setOpenIssue] = useState(false);
-  const [search ,setSearch] = useState(" ");
+  const [search ,setSearch] = useState("");
   const [issueData, setIssueData] = useState({
     studentId: "",
     bookId: "",
@@ -45,7 +36,7 @@ function Borrow() {
 
     setRows(formatted);
     setRowCount(data.total);
-  }, [page, pageSize]);
+  }, [page, pageSize,search]);
 
   useEffect(() => {
     fetchBorrow();
@@ -107,26 +98,33 @@ function Borrow() {
         <h2>BORROW BOOKS</h2>
       </Box>
 
-      {/* Issue Button */}
-      <Box display="flex" justifyContent="flex-end" mb={2}>
-        <Button
-          size="small"
-          variant="contained"
-          onClick={() => setOpenIssue(true)}
-        >
-          + Issue Book
-        </Button>
-      </Box>
+    <Box 
+  display="flex" 
+  justifyContent="space-between" 
+  alignItems="center"
+  mb={2}
+>
+  {/* Search bar */}
+  <TextField
+    size="small"
+    label="Search"
+    value={search}
+    onChange={(e) => {
+      setPage(0);
+      setSearch(e.target.value);
+    }}
+    sx={{ width: 200 }}
+  />
 
-   <TextField
-       size="small"
-       label="Search Borrow"
-       value={search}
-       onChange={(e) => {
-     setPage(0);
-     setSearch(e.target.value);
-         }}
-    />
+  {/* Add Student Button */}
+  <Button 
+    size="small" 
+    variant="contained" 
+    onClick={() => setOpenIssue(true)}
+  >
+    + Issue Book
+      </Button>
+  </Box>
 
       <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
 
