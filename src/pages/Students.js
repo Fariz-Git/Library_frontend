@@ -29,6 +29,7 @@ function Students() {
   const [openAdd, setOpenAdd] = useState(false);
 
   const [editData, setEditData] = useState(null);
+  const [search ,   setSearch] = useState (" ");
   const [newStudent, setNewStudent] = useState({
     name: "",
     email: "",
@@ -37,12 +38,12 @@ function Students() {
 
   const fetchStudents = useCallback(async () => {
     const res = await fetch(
-      `${BASE_URL}/students?page=${page + 1}&limit=${pageSize}`
+      `${BASE_URL}/students?page=${page + 1}&limit=${pageSize}&search=${search}`
     );
     const data = await res.json();
     setRows(data.data);
     setRowCount(data.total);
-  }, [page, pageSize]);
+  }, [page, pageSize, search]);
 
   useEffect(() => {
     fetchStudents();
@@ -110,11 +111,23 @@ function Students() {
       </Box>
 
     <Box display="flex" justifyContent="flex-end" mb={2}>
-      <Button size="small" variant="contained" onClick={() => setOpenAdd(true)}>
+      <Button size="small" variant="contained" onClick={() => setOpenAdd(true)} >
     + Add Student
     </Button>
     </Box>
 
+  <Box mb={2}>
+   <TextField
+    size="small"
+     label="Search"
+      value={search}
+      onChange={(e) => {
+      setPage(0);
+      setSearch(e.target.value);
+        }}
+      />
+    </Box>
+  
       <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
 
       <Stack mt={2} alignItems="center">

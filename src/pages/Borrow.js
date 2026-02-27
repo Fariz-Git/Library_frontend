@@ -24,6 +24,7 @@ function Borrow() {
   const [rowCount, setRowCount] = useState(0);
 
   const [openIssue, setOpenIssue] = useState(false);
+  const [search ,setSearch] = useState(" ");
   const [issueData, setIssueData] = useState({
     studentId: "",
     bookId: "",
@@ -31,7 +32,7 @@ function Borrow() {
 
   const fetchBorrow = useCallback(async () => {
     const res = await fetch(
-      `${BASE_URL}/borrow?page=${page + 1}&limit=${pageSize}`
+      `${BASE_URL}/borrow?page=${page + 1}&limit=${pageSize}&search=${search}`
     );
     const data = await res.json();
 
@@ -116,6 +117,16 @@ function Borrow() {
           + Issue Book
         </Button>
       </Box>
+
+   <TextField
+       size="small"
+       label="Search Borrow"
+       value={search}
+       onChange={(e) => {
+     setPage(0);
+     setSearch(e.target.value);
+         }}
+    />
 
       <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
 

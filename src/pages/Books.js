@@ -24,6 +24,7 @@ function Books() {
   const [page, setPage] = useState(0);
   const [pageSize] = useState(10);
   const [rowCount, setRowCount] = useState(0);
+  const [search, setSearch] = useState("");
 
   const [openEdit, setOpenEdit] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
@@ -33,17 +34,16 @@ function Books() {
     title: "",
     author: "",
     totalQuantity: "",
-    availableQuantity: "",
   });
 
   const fetchBooks = useCallback(async () => {
     const res = await fetch(
-      `${BASE_URL}/books?page=${page + 1}&limit=${pageSize}`
+      `${BASE_URL}/books?page=${page + 1}&limit=${pageSize}&search=${search}`
     );
     const data = await res.json();
     setRows(data.data);
     setRowCount(data.total);
-  }, [page, pageSize]);
+  }, [page, pageSize, search]);
 
   useEffect(() => {
     fetchBooks();
@@ -85,7 +85,6 @@ function Books() {
       title: "",
       author: "",
       totalQuantity: "",
-      availableQuantity: "",
     });
 
     fetchBooks();
@@ -120,15 +119,28 @@ function Books() {
 
   return (
     <Box p={3}>
-      {/* Centered Title */}
       <Box textAlign="center">
-       <h2>BOOKS</h2>
-        </Box>
+        <h2>BOOKS</h2>
+      </Box>
 
-    <Box display="flex" justifyContent="flex-end" mb={2}>
-   <Button size="small" variant="contained" onClick={() => setOpenAdd(true)}>
-    + Add Book
-     </Button>
+      <Box display="flex" justifyContent="space-between" mb={2}>
+        <TextField
+          size="small"
+          label="Search"
+          value={search}
+          onChange={(e) => {
+            setPage(0);
+            setSearch(e.target.value);
+          }}
+        />
+
+        <Button
+          size="small"
+          variant="contained"
+          onClick={() => setOpenAdd(true)}
+        >
+          + Add Book
+        </Button>
       </Box>
 
       <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
@@ -141,43 +153,15 @@ function Books() {
         />
       </Stack>
 
-      {/* Edit Dialog */}
-      <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
-        <DialogTitle>Edit Book</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            margin="dense"
-            label="Total Quantity"
-            value={editData?.totalQuantity || ""}
-            onChange={(e) =>
-              setEditData({ ...editData, totalQuantity: e.target.value })
-            }
-          />
-          <TextField
-            fullWidth
-            margin="dense"
-            label="Available Quantity"
-            value={editData?.availableQuantity || ""}
-            onChange={(e) =>
-              setEditData({
-                ...editData,
-                availableQuantity: e.target.value,
-              })
-            }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleUpdate}>
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Stack mt={2} alignItems="center">
+        <Button variant="outlined" onClick={() => navigate("/")}>
+          Back to Home
+        </Button>
+      </Stack>
 
       {/* Add Dialog */}
       <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
-        <DialogTitle>Add Book </DialogTitle>
+        <DialogTitle>Add Book</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -211,17 +195,53 @@ function Books() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenAdd(false)}>Cancel</Button>
+          <Button onClick={() => setOpenAdd(false)}>
+            Cancel
+          </Button>
           <Button variant="contained" onClick={handleAdd}>
             Add
           </Button>
         </DialogActions>
       </Dialog>
-      <center>
-      <Button variant="outlined" onClick={() => navigate("/")}>
-        ← Back to Home
-      </Button>
-      </center>
+
+      {/* Edit Dialog */}
+      <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
+        <DialogTitle>Edit Book</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Total Quantity"
+            value={editData?.totalQuantity || ""}
+            onChange={(e) =>
+              setEditData({
+                ...editData,
+                totalQuantity: e.target.value,
+              })
+            }
+          />
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Available Quantity"
+            value={editData?.availableQuantity || ""}
+            onChange={(e) =>
+              setEditData({
+                ...editData,
+                availableQuantity: e.target.value,
+              })
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEdit(false)}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleUpdate}>
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
