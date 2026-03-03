@@ -38,6 +38,10 @@ function Home() {
       <Button variant="contained" onClick={() => navigate("/borrow")} sx={{ m: 1 }}>
         Borrow
       </Button>
+      <Button variant="outlined" onClick={() => { localStorage.removeItem("isLoggedIn");
+       navigate("/login"); }} >
+      Logout
+      </Button>
 
       <hr />
 

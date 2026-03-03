@@ -1,19 +1,58 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Students from "./pages/Students";
 import Books from "./pages/Books";
 import Borrow from "./pages/Borrow";
+import Login from "./pages/Login"
+
+function PrivateRoute({ children }) {
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
+  return isLoggedIn ? children : <Navigate to="/login" />;
+}
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/students" element={<Students />} />
-        <Route path="/books" element={<Books />} />
-        <Route path="/borrow" element={<Borrow />} />
+        <Route path="/login" element={<Login />} />
+
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/students"
+          element={
+            <PrivateRoute>
+              <Students />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/books"
+          element={
+            <PrivateRoute>
+              <Books />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/borrow"
+          element={
+            <PrivateRoute>
+              <Borrow />
+            </PrivateRoute>
+          }
+        />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
