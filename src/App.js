@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/login";
 import Home from "./pages/Home";
 import Students from "./pages/Students";
 import Books from "./pages/Books";
 import Borrow from "./pages/Borrow";
-import Login from "./pages/login";
 import AdminSettings from "./pages/AdminSettings";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 function PrivateRoute({ children }) {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -17,20 +18,21 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
 
-        <Route
-        path="/" element={<PrivateRoute> <Home /> </PrivateRoute> }/>
+        <Route path="/" element={
+            <PrivateRoute> <DashboardLayout> <Home /> </DashboardLayout> </PrivateRoute>}/>
+            
+        <Route path="/students" element={ 
+          <PrivateRoute> <DashboardLayout> <Students /> </DashboardLayout> </PrivateRoute>}/>
 
-        <Route
-         path="/students" element={<PrivateRoute> <Students /> </PrivateRoute> } />
+        <Route path="/books" element={
+          <PrivateRoute> <DashboardLayout> <Books /> </DashboardLayout> </PrivateRoute> } />
 
-        <Route
-          path="/books" element={<PrivateRoute> <Books /> </PrivateRoute> } />
+        <Route path="/borrow" element={
+          <PrivateRoute> <DashboardLayout> <Borrow /> </DashboardLayout> </PrivateRoute> } />
 
-        <Route
-        path="/borrow" element={ <PrivateRoute> <Borrow /> </PrivateRoute>} />
-      
-        <Route path="/admin-settings" element={<AdminSettings />} />
-      
+        <Route path="/admin-settings" element={ <PrivateRoute>
+            <DashboardLayout> <AdminSettings /> </DashboardLayout> </PrivateRoute> }/>
+
       </Routes>
     </BrowserRouter>
   );

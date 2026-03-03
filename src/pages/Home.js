@@ -1,57 +1,106 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Button } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+} from "@mui/material";
+import CountUp from "react-countup";
 
 const BASE_URL = "http://localhost:3001";
 
 function Home() {
-  const navigate = useNavigate();
-
-  const [students, setStudents] = useState(0);
-  const [books, setBooks] = useState(0);
-  const [borrow, setBorrow] = useState(0);
+  const [stats, setStats] = useState({
+    students: 0,
+    books: 0,
+    borrow: 0,
+  });
 
   useEffect(() => {
-    fetch(`${BASE_URL}/students?page=1&limit=1`)
-      .then(res => res.json())
-      .then(data => setStudents(data.total));
+    const fetchStats = async () => {
+      const students = await fetch(
+        `${BASE_URL}/students?page=1&limit=1`
+      );
+      const books = await fetch(
+        `${BASE_URL}/books?page=1&limit=1`
+      );
+      const borrow = await fetch(
+        `${BASE_URL}/borrow?page=1&limit=1`
+      );
 
-    fetch(`${BASE_URL}/books?page=1&limit=1`)
-      .then(res => res.json())
-      .then(data => setBooks(data.total));
+      const sData = await students.json();
+      const bData = await books.json();
+      const brData = await borrow.json();
 
-    fetch(`${BASE_URL}/borrow?page=1&limit=1`)
-      .then(res => res.json())
-      .then(data => setBorrow(data.total));
+      setStats({
+        students: sData.total || 0,
+        books: bData.total || 0,
+        borrow: brData.total || 0,
+      });
+    };
+
+    fetchStats();
   }, []);
 
   return (
-    <Box textAlign="center" p={4}>
-      <h1>Library Management</h1>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      minHeight="80vh"
+    >
+      {/* Centered Title */}
+      <Typography variant="h4" mb={5} textAlign="center">
+        Dashboard
+      </Typography>
 
-      <Button variant="contained" onClick={() => navigate("/students")} sx={{ m: 1 }}>
-        Students
-      </Button>
-      <Button variant="contained" onClick={() => navigate("/books")} sx={{ m: 1 }}>
-        Books
-      </Button>
-      <Button variant="contained" onClick={() => navigate("/borrow")} sx={{ m: 1 }}>
-        Borrow
-      </Button>
-      <Button variant="contained" onClick={() => navigate("/admin-settings")} sx={{ m: 1 }} >
-      Admin Settings
-     </Button>
-      <Button variant="outlined" onClick={() => { localStorage.removeItem("isLoggedIn");
-       navigate("/login"); }} >
-      Logout
-      </Button>
+      {/* Centered Grid Container */}
+      <Box width="100%" maxWidth="1000px">
+        <Grid container spacing={4} justifyContent="center">
+          
+          <Grid item xs={12} md={4}>
+            <Card sx={{ textAlign: "center", p: 3 }}>
+              <CardContent>
+                <Typography variant="h6">
+                  👨‍🎓 Total Students
+                </Typography>
+                <Typography variant="h3" color="primary">
+                  <CountUp start={0} end={stats.students} duration={2} />
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
 
-      <hr />
+          <Grid item xs={12} md={4}>
+            <Card sx={{ textAlign: "center", p: 3 }}>
+              <CardContent>
+                <Typography variant="h6">
+                  📚 Total Books
+                </Typography>
+                <Typography variant="h3" color="secondary">
+                  <CountUp start={0} end={stats.books} duration={2} />
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
 
-      <h3>Dashboard Details</h3>
-      <p>Total Students: {students}</p>
-      <p>Total Books: {books}</p>
-      <p>Total Borrow Records: {borrow}</p>
+          <Grid item xs={12} md={4}>
+            <Card sx={{ textAlign: "center", p: 3 }}>
+              <CardContent>
+                <Typography variant="h6">
+                  🔁 Borrow Records
+                </Typography>
+                <Typography variant="h3" color="success.main">
+                  <CountUp start={0} end={stats.borrow} duration={2} />
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+        </Grid>
+      </Box>
     </Box>
   );
 }
