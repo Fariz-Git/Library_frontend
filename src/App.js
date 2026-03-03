@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Students from "./pages/Students";
 import Books from "./pages/Books";
 import Borrow from "./pages/Borrow";
-import Login from "./pages/Login"
+import Login from "./pages/login"
 
 function PrivateRoute({ children }) {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
