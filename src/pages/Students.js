@@ -58,16 +58,26 @@ function Students() {
     fetchStudents();
   };
 
-  const handleAdd = async () => {
-    await fetch(`${BASE_URL}/students`, {
+  const handleAdd = async () =>  {
+    try{
+      const res = await fetch(`${BASE_URL}/students`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newStudent),
     });
-    setOpenAdd(false);
-    setNewStudent({ name: "", email: "", department: "" });
-    fetchStudents();
-  };
+    if (res.ok){
+      alert ("New Student Added")
+      setOpenAdd(false);
+      setNewStudent({ name: "", email: "", department: "" });
+      fetchStudents();
+    }else {
+    alert("Failed to add student or Email address already exist");
+    }
+  }catch (error){
+    alert("server error");
+    console.error(error);
+  }
+};
 
   const columns = [
     { field: "id", headerName: "ID", width: 90 },
@@ -130,7 +140,8 @@ function Students() {
       </Button>
   </Box>
   
-      <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
+      <DataGrid rows={rows} columns={columns} autoHeight 
+        sx={{backgroundColor : "white" , borderRadius :2 , boxShadow :2 }} />
 
        <Stack
         mt={2}

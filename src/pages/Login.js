@@ -37,13 +37,13 @@ function Login() {
     >
       <Paper sx={{ p: 4, width: 300 }}>
                 <center>
-            <h2>Admin Login</h2>
+            <h2>Admin Login 🔒</h2>
             </center>
 
         <TextField
           fullWidth
           margin="dense"
-          label="Username"
+          placeholder="Username"
           onChange={(e) =>
             setForm({ ...form, username: e.target.value })
           }
@@ -53,7 +53,7 @@ function Login() {
           fullWidth
           margin="dense"
           type="password"
-          label="Password"
+          placeholder="Password"
           onChange={(e) =>
             setForm({ ...form, password: e.target.value })
           }

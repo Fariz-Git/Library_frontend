@@ -7,11 +7,10 @@ import {
   Toolbar,
   Typography,
   Divider,
-  colors,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const drawerWidth = 220;
+const drawerWidth = 240;
 
 function DashboardLayout({ children }) {
   const navigate = useNavigate();
@@ -22,7 +21,7 @@ function DashboardLayout({ children }) {
     { text: "Students", path: "/students" },
     { text: "Books", path: "/books" },
     { text: "Borrow", path: "/borrow" },
-    { text: "Admin ⚙️ ", path: "/admin-settings" },
+    { text: "Admin Settings", path: "/admin-settings" },
   ];
 
   const logout = () => {
@@ -32,27 +31,23 @@ function DashboardLayout({ children }) {
 
   return (
     <Box sx={{ display: "flex" }}>
+      
       {/* Sidebar */}
       <Drawer
         variant="permanent"
         sx={{
-            
           width: drawerWidth,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: "border-box",
-            backgroundColor : "black",
-            color : "white"
-
+            background: "linear-gradient(180deg, #4f46e5, #6366f1)",
+            color: "white",
           },
-        
         }}
       >
         <Toolbar>
-          <Typography variant="h6">
-            📚 Library
-          </Typography>
+          <Typography variant="h6">📚 Library</Typography>
         </Toolbar>
 
         <Divider />
@@ -63,12 +58,20 @@ function DashboardLayout({ children }) {
               key={item.text}
               selected={location.pathname === item.path}
               onClick={() => navigate(item.path)}
+              sx={{
+                "&.Mui-selected": {
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                },
+                "&:hover": {
+                  backgroundColor: "rgba(255,255,255,0.15)",
+                },
+              }}
             >
               <ListItemText primary={item.text} />
             </ListItemButton>
           ))}
 
-          <Divider sx={{my: 1 }}  />
+          <Divider sx={{ my: 1 }} />
 
           <ListItemButton onClick={logout}>
             <ListItemText primary="Logout" />
@@ -76,10 +79,16 @@ function DashboardLayout({ children }) {
         </List>
       </Drawer>
 
-      {/* Main Content */}
+      {/* MAIN CONTENT FIXED */}
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3 }}
+        sx={{
+          flexGrow: 1,
+          width: `calc(100% - ${drawerWidth}px)`,
+          minHeight: "100vh",
+          backgroundColor: "#f4f6f8",
+          p: 4,
+        }}
       >
         {children}
       </Box>

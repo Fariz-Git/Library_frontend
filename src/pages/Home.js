@@ -61,8 +61,12 @@ function Home() {
         <Grid container spacing={4} justifyContent="center">
           
           <Grid item xs={12} md={4}>
-            <Card sx={{ textAlign: "center", p: 3 }}>
-              <CardContent>
+            <Card sx={{ textAlign: "center",  p: 3,
+          borderRadius: 3, background: "linear-gradient(135deg, #4f46e5, #6366f1)",
+          color: "white", transition: "0.3s", "&:hover": {
+          transform: "translateY(-5px)", boxShadow: 6,}, }}>
+
+          <CardContent>
                 <Typography variant="h6">
                   👨‍🎓 Total Students
                 </Typography>
@@ -74,7 +78,9 @@ function Home() {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Card sx={{ textAlign: "center", p: 3 }}>
+            <Card   sx={{ textAlign: "center", p: 3,
+         borderRadius: 3,   background: "linear-gradient(135deg, #ec4899, #f472b6)",color: "white",
+           transition: "0.3s", "&:hover": { transform: "translateY(-5px)", boxShadow: 6,}, }}>
               <CardContent>
                 <Typography variant="h6">
                   📚 Total Books
@@ -87,7 +93,9 @@ function Home() {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Card sx={{ textAlign: "center", p: 3 }}>
+            <Card sx={{ textAlign: "center", p: 3,
+         borderRadius: 3, background: "linear-gradient(135deg, #10b981, #34d399)",color: "white",
+           transition: "0.3s", "&:hover": { transform: "translateY(-5px)", boxShadow: 6,}, }}>
               <CardContent>
                 <Typography variant="h6">
                   🔁 Borrow Records

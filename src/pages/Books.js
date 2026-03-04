@@ -62,24 +62,32 @@ function Books() {
   };
 
   const handleAdd = async () => {
-    await fetch(`${BASE_URL}/books`, {
+    try{
+    const res = await fetch(`${BASE_URL}/books`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         title: newBook.title,
         author: newBook.author,
         totalQuantity: Number(newBook.totalQuantity),
-      }),
-    });
-
-    setOpenAdd(false);
-    setNewBook({
+        availableQuantity:Number(newBook.availableQuantity),}),
+      });
+      if (res.ok){  
+       alert ("New Book Added") 
+      setOpenAdd(false);
+      setNewBook({
       title: "",
       author: "",
       totalQuantity: "",
-    });
-
-    fetchBooks();
+      availableQuantity: "",});
+     fetchBooks();
+    }else {
+      alert("Failed to add book")
+    }
+      }catch (error){
+      alert("server error");
+      console.error(error);
+      }
   };
 
   const columns = [
@@ -139,11 +147,12 @@ function Books() {
     variant="contained" 
     onClick={() => setOpenAdd(true)}
   >
-    + Add Student
+    + Add Book
       </Button>
   </Box>
 
-      <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
+      <DataGrid rows={rows} columns={columns} hideFooter autoHeight 
+      sx={{backgroundColor : "white" , borderRadius :2 , boxShadow :2}}/>
 
       <Stack
         mt={2}
@@ -212,6 +221,18 @@ function Books() {
               setNewBook({
                 ...newBook,
                 totalQuantity: e.target.value,
+              })
+            }
+          />
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Available Quantity"
+            value={newBook.availableQuantity}
+            onChange={(e) =>
+              setNewBook({
+                ...newBook,
+                availableQuantity: e.target.value,
               })
             }
           />

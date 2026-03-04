@@ -43,6 +43,7 @@ function Borrow() {
   }, [fetchBorrow]);
 
   const handleIssue = async () => {
+
     await fetch(`${BASE_URL}/borrow/issue`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -51,7 +52,7 @@ function Borrow() {
         bookId: Number(issueData.bookId),
       }),
     });
-
+    alert ("book issued")
     setOpenIssue(false);
     setIssueData({ studentId: "", bookId: "" });
     fetchBorrow();
@@ -61,6 +62,7 @@ function Borrow() {
     await fetch(`${BASE_URL}/borrow/return/${id}`, {
       method: "POST",
     });
+    alert ("book returned")
     fetchBorrow();
   };
 
@@ -126,7 +128,8 @@ function Borrow() {
       </Button>
   </Box>
 
-      <DataGrid rows={rows} columns={columns} hideFooter autoHeight />
+      <DataGrid rows={rows} columns={columns} hideFooter autoHeight  
+      sx={{backgroundColor : "white" , borderRadius :2 , boxShadow :2}} />
 
       {/* Pagination */}
       <Stack mt={2} alignItems="center">
