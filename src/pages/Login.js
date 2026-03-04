@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Box, Button, TextField, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-
 const BASE_URL = "http://localhost:3001";
 
 function Login() {
@@ -14,17 +13,30 @@ function Login() {
   });
 
   const handleLogin = async () => {
-    const res = await fetch(`${BASE_URL}/admin/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/admin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    if (res.ok) {
-      localStorage.setItem("isLoggedIn", "true");
-      navigate("/");
-    } else {
-      alert("Invalid credentials");
+      const data = await res.json();
+
+      if (res.ok) {
+        // ✅ Store login status
+        localStorage.setItem("isLoggedIn", "true");
+
+        // ✅ Store logged-in admin ID (IMPORTANT)
+        localStorage.setItem("adminId", data.adminId);
+
+        alert("Login Successfully");
+        navigate("/");
+      } else {
+        alert(data.message || "Invalid Credentials");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Server error. Try again.");
     }
   };
 
@@ -36,14 +48,15 @@ function Login() {
       height="100vh"
     >
       <Paper sx={{ p: 4, width: 300 }}>
-                <center>
-            <h2>Admin Login 🔒</h2>
-            </center>
+        <center>
+          <h2>Admin Login 🔒</h2>
+        </center>
 
         <TextField
           fullWidth
           margin="dense"
           placeholder="Username"
+          value={form.username}
           onChange={(e) =>
             setForm({ ...form, username: e.target.value })
           }
@@ -54,6 +67,7 @@ function Login() {
           margin="dense"
           type="password"
           placeholder="Password"
+          value={form.password}
           onChange={(e) =>
             setForm({ ...form, password: e.target.value })
           }

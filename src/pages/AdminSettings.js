@@ -11,23 +11,22 @@ const BASE_URL = "http://localhost:3001";
 
 function AdminSettings() {
   const navigate = useNavigate();
-  const adminId = localStorage.getItem("adminId");
 
   const [form, setForm] = useState({
     username: "",
     password: "",
   });
 
-  const handleUpdate = async () => {
-    await fetch(`${BASE_URL}/admin/update/${adminId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+ const handleCreate = async () => {
+  await fetch(`${BASE_URL}/admin/create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(form),
+  });
 
-    alert("Admin Updated Successfully");
-    navigate("/");
-  };
+  alert("New Admin Created Successfully");
+  navigate("/");
+};
 
   return (
     <Box p={3}>
@@ -61,7 +60,7 @@ function AdminSettings() {
 
         <Button
           variant="contained"
-          onClick={handleUpdate}
+          onClick={handleCreate}
         >
           Update
         </Button>
