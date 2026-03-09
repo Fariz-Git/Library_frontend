@@ -1,92 +1,115 @@
 import { useEffect, useState, useCallback } from "react";
-import {Box, Button, Dialog,DialogTitle,DialogContent, DialogActions,
-  TextField, Stack, Pagination,MenuItem,Select,FormControl,
-  InputLabel } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Stack,
+  Pagination,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "http://localhost:3001";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchStudents,
+  addStudent,
+  updateStudent,
+  deleteStudent,
+} from "../redux/slices/studentSlice";
 
 function Students() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [rows, setRows] = useState([]);
+  const { rows, total } = useSelector((state) => state.students);
+
   const [page, setPage] = useState(0);
-  const [pageSize , setPageSize] = useState(10);
-  const [rowCount, setRowCount] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  const [search, setSearch] = useState("");
 
   const [openEdit, setOpenEdit] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
 
   const [editData, setEditData] = useState(null);
-  const [search ,   setSearch] = useState ("");
+
   const [newStudent, setNewStudent] = useState({
     name: "",
     email: "",
     department: "",
   });
 
-  const fetchStudents = useCallback(async () => {
-    const res = await fetch(
-      `${BASE_URL}/students?page=${page + 1}&limit=${pageSize}&search=${search}`
+  const loadStudents = useCallback(() => {
+    dispatch(
+      fetchStudents({
+        page: page + 1,
+        limit: pageSize,
+        search: search,
+      })
     );
-    const data = await res.json();
-    setRows(data.data);
-    setRowCount(data.total);
-  }, [page, pageSize, search]);
+  }, [dispatch, page, pageSize, search]);
 
   useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
+    loadStudents();
+  }, [loadStudents]);
 
   const handleDelete = async (id) => {
-    await fetch(`${BASE_URL}/students/${id}`, {
-      method: "DELETE",
-    });
-    fetchStudents();
+    await dispatch(deleteStudent(id));
+    loadStudents();
   };
 
   const handleUpdate = async () => {
-    await fetch(`${BASE_URL}/students/${editData.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editData),
-    });
+    await dispatch(
+      updateStudent({
+        id: editData.id,
+        data: editData,
+      })
+    );
+
     setOpenEdit(false);
-    fetchStudents();
+    loadStudents();
   };
 
-  const handleAdd = async () =>  {
-    try{
-      const res = await fetch(`${BASE_URL}/students`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newStudent),
+  const handleAdd = async () => {
+    await dispatch(addStudent(newStudent));
+
+    setOpenAdd(false);
+
+    setNewStudent({
+      name: "",
+      email: "",
+      department: "",
     });
-    if (res.ok){
-      alert ("New Student Added")
-      setOpenAdd(false);
-      setNewStudent({ name: "", email: "", department: "" });
-      fetchStudents();
-    }else {
-    alert("Failed to add student or Email address already exist");
-    }
-  }catch (error){
-    alert("server error");
-    console.error(error);
-  }
-};
+
+    loadStudents();
+  };
 
   const columns = [
     { field: "id", headerName: "ID", width: 90 },
+
     { field: "name", headerName: "Name", flex: 1 },
+
     { field: "email", headerName: "Email", flex: 1 },
+
     { field: "department", headerName: "Department", flex: 1 },
+
     {
       field: "actions",
       headerName: "Actions",
+      width: 120,
+
       renderCell: (params) => (
         <>
           <EditIcon
@@ -96,6 +119,7 @@ function Students() {
               setOpenEdit(true);
             }}
           />
+
           <DeleteIcon
             sx={{ cursor: "pointer" }}
             onClick={() => handleDelete(params.row.id)}
@@ -107,43 +131,48 @@ function Students() {
 
   return (
     <Box p={3}>
-
-    <Box textAlign="center">
-     <h2>STUDENTS</h2>
+      <Box textAlign="center">
+        <h2>STUDENTS</h2>
       </Box>
 
- <Box 
-  display="flex" 
-  justifyContent="space-between" 
-  alignItems="center"
-  mb={2}
->
-  {/* Search bar */}
-  <TextField
-    size="small"
-    label="Search"
-    value={search}
-    onChange={(e) => {
-      setPage(0);
-      setSearch(e.target.value);
-    }}
-    sx={{ width: 200 }}
-  />
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
+        <TextField
+          size="small"
+          label="Search"
+          value={search}
+          onChange={(e) => {
+            setPage(0);
+            setSearch(e.target.value);
+          }}
+        />
 
-  {/* Add Student Button */}
-  <Button 
-    size="small" 
-    variant="contained" 
-    onClick={() => setOpenAdd(true)}
-  >
-    + Add Student
-      </Button>
-  </Box>
-  
-      <DataGrid rows={rows} columns={columns} autoHeight 
-        sx={{backgroundColor : "white" , borderRadius :2 , boxShadow :2 }} />
+        <Button
+          size="small"
+          variant="contained"
+          onClick={() => setOpenAdd(true)}
+        >
+          + Add Student
+        </Button>
+      </Box>
 
-       <Stack
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        autoHeight
+        hideFooter
+        sx={{
+          backgroundColor: "white",
+          borderRadius: 2,
+          boxShadow: 2,
+        }}
+      />
+
+      <Stack
         mt={2}
         direction="row"
         spacing={3}
@@ -151,13 +180,14 @@ function Students() {
         alignItems="center"
       >
         <Pagination
-          count={Math.ceil(rowCount / pageSize)}
+          count={Math.ceil(total / pageSize)}
           page={page + 1}
           onChange={(e, value) => setPage(value - 1)}
         />
 
         <FormControl size="small">
           <InputLabel>Per Page</InputLabel>
+
           <Select
             value={pageSize}
             label="Per Page"
@@ -167,15 +197,23 @@ function Students() {
             }}
           >
             <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={25}>25</MenuItem>
-            <MenuItem value={50}>50</MenuItem>
+            <MenuItem value={15}>15</MenuItem>
+            <MenuItem value={20}>20</MenuItem>
           </Select>
         </FormControl>
       </Stack>
 
-      {/* Edit Dialog */}
+      <Stack mt={3} alignItems="center">
+        <Button variant="outlined" onClick={() => navigate("/")}>
+          ← Back to Home
+        </Button>
+      </Stack>
+
+      {/* EDIT DIALOG */}
+
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
         <DialogTitle>Edit Student</DialogTitle>
+
         <DialogContent>
           <TextField
             fullWidth
@@ -183,39 +221,54 @@ function Students() {
             label="Name"
             value={editData?.name || ""}
             onChange={(e) =>
-              setEditData({ ...editData, name: e.target.value })
+              setEditData({
+                ...editData,
+                name: e.target.value,
+              })
             }
           />
+
           <TextField
             fullWidth
             margin="dense"
             label="Email"
             value={editData?.email || ""}
             onChange={(e) =>
-              setEditData({ ...editData, email: e.target.value })
+              setEditData({
+                ...editData,
+                email: e.target.value,
+              })
             }
           />
+
           <TextField
             fullWidth
             margin="dense"
             label="Department"
             value={editData?.department || ""}
             onChange={(e) =>
-              setEditData({ ...editData, department: e.target.value })
+              setEditData({
+                ...editData,
+                department: e.target.value,
+              })
             }
           />
         </DialogContent>
+
         <DialogActions>
           <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
+
           <Button variant="contained" onClick={handleUpdate}>
             Update
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Add Dialog */}
+      {/* ADD STUDENT */}
+
       <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
         <DialogTitle>Add Student</DialogTitle>
+
         <DialogContent>
           <TextField
             fullWidth
@@ -223,18 +276,26 @@ function Students() {
             label="Name"
             value={newStudent.name}
             onChange={(e) =>
-              setNewStudent({ ...newStudent, name: e.target.value })
+              setNewStudent({
+                ...newStudent,
+                name: e.target.value,
+              })
             }
           />
+
           <TextField
             fullWidth
             margin="dense"
             label="Email"
             value={newStudent.email}
             onChange={(e) =>
-              setNewStudent({ ...newStudent, email: e.target.value })
+              setNewStudent({
+                ...newStudent,
+                email: e.target.value,
+              })
             }
           />
+
           <TextField
             fullWidth
             margin="dense"
@@ -248,19 +309,15 @@ function Students() {
             }
           />
         </DialogContent>
+
         <DialogActions>
           <Button onClick={() => setOpenAdd(false)}>Cancel</Button>
+
           <Button variant="contained" onClick={handleAdd}>
             Add
           </Button>
         </DialogActions>
       </Dialog>
-
-      <center>
-      <Button variant="outlined" onClick={() => navigate("/")}>
-        ← Back to Home
-      </Button>
-      </center>
     </Box>
   );
 }

@@ -1,75 +1,88 @@
 import { useEffect, useState, useCallback } from "react";
-import {Box, Button, Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField,Stack,Pagination,} from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Stack,
+  Pagination,
+} from "@mui/material";
+
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "http://localhost:3001";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchBorrow,
+  issueBook,
+  returnBook,
+} from "../redux/slices/borrowSlice";
 
 function Borrow() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [rows, setRows] = useState([]);
+  const { rows, total } = useSelector((state) => state.borrow);
+
   const [page, setPage] = useState(0);
   const [pageSize] = useState(10);
-  const [rowCount, setRowCount] = useState(0);
+
+  const [search, setSearch] = useState("");
 
   const [openIssue, setOpenIssue] = useState(false);
-  const [search ,setSearch] = useState("");
+
   const [issueData, setIssueData] = useState({
     studentId: "",
     bookId: "",
   });
 
-  const fetchBorrow = useCallback(async () => {
-    const res = await fetch(
-      `${BASE_URL}/borrow?page=${page + 1}&limit=${pageSize}&search=${search}`
+  const loadBorrow = useCallback(() => {
+    dispatch(
+      fetchBorrow({
+        page: page + 1,
+        limit: pageSize,
+        search: search,
+      })
     );
-    const data = await res.json();
-
-    const formatted = data.data.map((b) => ({
-      id: b.id,
-      student: b.student?.name,
-      book: b.book?.title,
-      returned: b.returned,
-    }));
-
-    setRows(formatted);
-    setRowCount(data.total);
-  }, [page, pageSize,search]);
+  }, [dispatch, page, pageSize, search]);
 
   useEffect(() => {
-    fetchBorrow();
-  }, [fetchBorrow]);
+    loadBorrow();
+  }, [loadBorrow]);
 
   const handleIssue = async () => {
-
-    await fetch(`${BASE_URL}/borrow/issue`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    await dispatch(
+      issueBook({
         studentId: Number(issueData.studentId),
         bookId: Number(issueData.bookId),
-      }),
-    });
-    alert ("book issued")
+      })
+    );
+
     setOpenIssue(false);
-    setIssueData({ studentId: "", bookId: "" });
-    fetchBorrow();
+
+    setIssueData({
+      studentId: "",
+      bookId: "",
+    });
+
+    loadBorrow();
   };
 
   const handleReturn = async (id) => {
-    await fetch(`${BASE_URL}/borrow/return/${id}`, {
-      method: "POST",
-    });
-    alert ("book returned")
-    fetchBorrow();
+    await dispatch(returnBook(id));
+    loadBorrow();
   };
 
   const columns = [
     { field: "id", headerName: "ID", width: 90 },
+
     { field: "student", headerName: "Student", flex: 1 },
+
     { field: "book", headerName: "Book", flex: 1 },
+
     {
       field: "returned",
       headerName: "Status",
@@ -77,6 +90,7 @@ function Borrow() {
       renderCell: (params) =>
         params.row.returned ? "Returned" : "Not Returned",
     },
+
     {
       field: "actions",
       headerName: "Actions",
@@ -95,61 +109,67 @@ function Borrow() {
 
   return (
     <Box p={3}>
-      {/* Centered Title */}
       <Box textAlign="center">
         <h2>BORROW BOOKS</h2>
       </Box>
 
-    <Box 
-  display="flex" 
-  justifyContent="space-between" 
-  alignItems="center"
-  mb={2}
->
-  {/* Search bar */}
-  <TextField
-    size="small"
-    label="Search"
-    value={search}
-    onChange={(e) => {
-      setPage(0);
-      setSearch(e.target.value);
-    }}
-    sx={{ width: 200 }}
-  />
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
+        <TextField
+          size="small"
+          label="Search"
+          value={search}
+          onChange={(e) => {
+            setPage(0);
+            setSearch(e.target.value);
+          }}
+          sx={{ width: 200 }}
+        />
 
-  {/* Add Student Button */}
-  <Button 
-    size="small" 
-    variant="contained" 
-    onClick={() => setOpenIssue(true)}
-  >
-    + Issue Book
-      </Button>
-  </Box>
+        <Button
+          size="small"
+          variant="contained"
+          onClick={() => setOpenIssue(true)}
+        >
+          + Issue Book
+        </Button>
+      </Box>
 
-      <DataGrid rows={rows} columns={columns} hideFooter autoHeight  
-      sx={{backgroundColor : "white" , borderRadius :2 , boxShadow :2}} />
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        autoHeight
+        hideFooter
+        sx={{
+          backgroundColor: "white",
+          borderRadius: 2,
+          boxShadow: 2,
+        }}
+      />
 
-      {/* Pagination */}
       <Stack mt={2} alignItems="center">
         <Pagination
-          count={Math.ceil(rowCount / pageSize)}
+          count={Math.ceil(total / pageSize)}
           page={page + 1}
           onChange={(e, value) => setPage(value - 1)}
         />
       </Stack>
 
-      {/* Back Button Centered Below Pagination */}
       <Stack mt={2} alignItems="center">
         <Button variant="outlined" onClick={() => navigate("/")}>
-          Back to Home
+          ← Back to Home
         </Button>
       </Stack>
 
-      {/* Issue Dialog */}
+      {/* ISSUE BOOK */}
+
       <Dialog open={openIssue} onClose={() => setOpenIssue(false)}>
         <DialogTitle>Issue Book</DialogTitle>
+
         <DialogContent>
           <TextField
             fullWidth
@@ -163,6 +183,7 @@ function Borrow() {
               })
             }
           />
+
           <TextField
             fullWidth
             margin="dense"
@@ -176,10 +197,10 @@ function Borrow() {
             }
           />
         </DialogContent>
+
         <DialogActions>
-          <Button onClick={() => setOpenIssue(false)}>
-            Cancel
-          </Button>
+          <Button onClick={() => setOpenIssue(false)}>Cancel</Button>
+
           <Button variant="contained" onClick={handleIssue}>
             Issue
           </Button>

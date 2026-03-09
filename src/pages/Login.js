@@ -4,14 +4,18 @@ import {
   Button,
   TextField,
   Paper,
-  Typography
+  Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "http://localhost:3001";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
+import { loginAdmin } from "../redux/slices/adminSlice";
 
 function Login() {
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [form, setForm] = useState({
     username: "",
@@ -19,41 +23,33 @@ function Login() {
   });
 
   const handleLogin = async () => {
+
     try {
 
-      const res = await fetch(`${BASE_URL}/admin/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(form)
-      });
+      const resultAction = await dispatch(loginAdmin(form));
 
-      const data = await res.json();
+      const data = resultAction.payload;
 
-      if (res.ok) {
-
-        // Store login session
-        localStorage.setItem("isLoggedIn", "true");
-
-        // Store admin id
-        localStorage.setItem("adminId", data.adminId);
-
-        // Store role (superadmin / admin)
-        localStorage.setItem("role", data.role);
-
-        alert("Login Successful");
-
-        navigate("/");
-
-      } else {
-        alert(data.message || "Invalid Credentials");
+      // If backend returns error
+      if (!data || !data.adminId) {
+        alert("Invalid username or password");
+        return;
       }
 
+      // Save session
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("adminId", data.adminId);
+      localStorage.setItem("role", data.role);
+
+      alert("Login Successful");
+
+      navigate("/");
+
     } catch (error) {
-      console.error("Login error:", error);
+      console.error(error);
       alert("Server error. Please try again.");
     }
+
   };
 
   return (
@@ -70,7 +66,7 @@ function Login() {
           p: 4,
           width: 320,
           borderRadius: 3,
-          boxShadow: 4
+          boxShadow: 4,
         }}
       >
 
@@ -90,7 +86,7 @@ function Login() {
           onChange={(e) =>
             setForm({
               ...form,
-              username: e.target.value
+              username: e.target.value,
             })
           }
         />
@@ -104,7 +100,7 @@ function Login() {
           onChange={(e) =>
             setForm({
               ...form,
-              password: e.target.value
+              password: e.target.value,
             })
           }
         />
